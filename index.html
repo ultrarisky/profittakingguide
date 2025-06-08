@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ULTRA RISKY CHANNEL PROFIT TAKING GUIDE</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Base */
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(45deg, #6b73ff, #000dff);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Container */
+    .container {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    /* Inputs */
+    label {
+      display: inline-block;
+      margin: 0.5rem 1rem 1rem 0;
+      color: #444;
+      font-weight: 600;
+    }
+    input[type="text"],
+    input[type="number"] {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color .2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #6b73ff;
+    }
+
+    /* Buttons */
+    button {
+      margin: 0.5rem 0.5rem 0.5rem 0;
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #6b73ff;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform .2s, background .2s;
+    }
+    button:hover {
+      background: #5a62e0;
+      transform: scale(1.05);
+    }
+    button:active {
+      transform: scale(0.97);
+    }
+    .remove-btn {
+      background: #ff6b6b;
+    }
+    .remove-btn:hover {
+      background: #e05555;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: right;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #f7f7f7;
+      font-weight: 600;
+    }
+    .center { text-align: center; }
+
+    /* Bounce animation */
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-15px); }
+      60% { transform: translateY(-7px); }
+    }
+    .bounce {
+      animation: bounce 0.8s;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>ULTRA RISKY CHANNEL PROFIT TAKING GUIDE</h1>
+
+    <label>
+      Ticker:
+      <input type="text" id="ticker" placeholder="e.g. LAES">
+    </label>
+
+    <label>
+      Entry Price:
+      <input type="number" id="entryPrice" step="0.01" value="5">
+    </label>
+    <label>
+      Initial Investment:
+      <input type="number" id="initialInvestment" step="0.01" value="10000">
+    </label>
+
+    <h2>Sell Targets</h2>
+    <table id="targetsTable">
+      <thead>
+        <tr>
+          <th class="center">#</th>
+          <th>% Gain</th>
+          <th>% of Remaining</th>
+          <th class="center">Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button onclick="addTarget()">+ Add Target</button>
+    <button onclick="calculate()">Calculate</button>
+
+    <h2>Results</h2>
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Sold</th>
+          <th>Remaining</th>
+          <th>Proceeds</th>
+          <th>Suggestion</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <th colspan="4">Total Proceeds</th>
+          <td id="totalProceeds">—</td>
+          <td></td>
+        </tr>
+        <tr>
+          <th colspan="4">Profit</th>
+          <td id="profit">—</td>
+          <td id="donationSuggestion">—</td>
+        </tr>
+        <tr>
+          <th colspan="4">% Gain</th>
+          <td id="percentGain">—</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <script>
+    let targetCount = 0;
+
+    function addTarget(gain = "", pct = "") {
+      targetCount++;
+      const tbody = document.querySelector('#targetsTable tbody');
+      const row = document.createElement('tr');
+      row.id = 'targetRow' + targetCount;
+      row.innerHTML = `
+        <td class="center">${targetCount}</td>
+        <td><input type="number" step="1" min="0" id="gain${targetCount}" value="${gain}" />%</td>
+        <td><input type="number" step="1" min="0" max="100" id="sellPct${targetCount}" value="${pct}" />%</td>
+        <td class="center">
+          <button class="remove-btn" onclick="removeTarget(${targetCount})">✕</button>
+        </td>`;
+      // animate new row
+      row.classList.add('bounce');
+      tbody.appendChild(row);
+    }
+
+    function removeTarget(i) {
+      const row = document.getElementById('targetRow' + i);
+      row.classList.add('bounce');
+      setTimeout(() => row.remove(), 300);
+    }
+
+    function calculate() {
+      const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+      const initialInvestment = parseFloat(document.getElementById('initialInvestment').value);
+
+      // gather & sort targets
+      const targets = [];
+      for (let i = 1; i <= targetCount; i++) {
+        const g = document.getElementById('gain'+i);
+        const s = document.getElementById('sellPct'+i);
+        if (!g || !s) continue;
+        const gain = parseFloat(g.value), sellPct = parseFloat(s.value);
+        if (isNaN(gain)||isNaN(sellPct)) continue;
+        targets.push({ gain, sellPct });
+      }
+      targets.sort((a,b) => a.gain - b.gain);
+
+      // reset results
+      let remaining = Math.floor(initialInvestment / entryPrice);
+      let totalProceeds = 0;
+      const body = document.querySelector('#resultTable tbody');
+      body.innerHTML = '';
+
+      targets.forEach(t => {
+        const price = entryPrice * (1 + t.gain/100);
+        const toSell = Math.floor(remaining * t.sellPct/100);
+        const proceeds = toSell * price;
+        remaining -= toSell;
+        totalProceeds += proceeds;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${t.gain}% Gain</td>
+          <td>${price.toFixed(2)}</td>
+          <td>${toSell}</td>
+          <td>${remaining}</td>
+          <td>${proceeds.toFixed(2)}</td>
+          <td></td>`;
+        tr.classList.add('bounce');
+        body.appendChild(tr);
+      });
+
+      // totals & suggestion
+      document.getElementById('totalProceeds').textContent = totalProceeds.toFixed(2);
+      const profit = totalProceeds - initialInvestment;
+      document.getElementById('profit').textContent = profit.toFixed(2);
+      document.getElementById('percentGain').textContent =
+        ((profit/initialInvestment)*100).toFixed(2) + '%';
+
+      const donation = profit * 0.10;
+      document.getElementById('donationSuggestion').textContent =
+        `Donate $${donation.toFixed(2)} to Giving Heart Foundation`;
+    }
+
+    // init with example
+    window.onload = () => {
+      addTarget(10, 10);
+      addTarget(30, 30);
+      addTarget(50, 100);
+    };
+  </script>
+</body>
+</html>
